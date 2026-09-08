@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/axios";
-import { RegisterCredentials } from "@/types";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -19,11 +18,15 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const payload: RegisterCredentials = { email, password };
-      await api.post("/auth/register", payload);
+      await api.post("/users/register", { email, password });
       router.push("/login");
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || "Failed to register account");
+      setError(
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed"
+      );
     } finally {
       setLoading(false);
     }
@@ -79,7 +82,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
           >
             {loading ? "Creating account..." : "Register"}
           </button>

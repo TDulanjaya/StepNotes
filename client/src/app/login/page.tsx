@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/axios";
-import { LoginCredentials, AuthResponse } from "@/types";
+import { AuthResponse } from "@/types";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,17 +19,27 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const payload: LoginCredentials = { email, password };
-      const res = await api.post<AuthResponse>("/auth/login", payload);
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
 
-      const token = res.data?.token || res.data?.accessToken || res.data?.access_token;
+      const res = await api.post<AuthResponse>("/users/login", formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+
+      const token = res.data?.access_token || res.data?.token || res.data?.accessToken;
       if (token) {
         localStorage.setItem("token", token);
       }
 
       router.push("/notes");
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || "Failed to log in");
+      setError(
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to log in"
+      );
     } finally {
       setLoading(false);
     }
@@ -85,7 +95,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+            className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
