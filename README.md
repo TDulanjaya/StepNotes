@@ -182,20 +182,6 @@ This project uses **JSON Web Tokens (JWT)** and **bcrypt** password hashing for 
 
 ---
 
-## API Endpoints Overview
-
-| Method | Endpoint | Description | Protected |
-| :--- | :--- | :--- | :---: |
-| `POST` | `/users/register` | Register a new user | No |
-| `POST` | `/users/login` | Login and receive a JWT token | No |
-| `GET` | `/notes/` | List notes | Yes / Optional |
-| `GET` | `/notes/{id}` | Get single note by ID | Yes / Optional |
-| `POST` | `/notes/` | Create a new note | Yes / Optional |
-| `PUT` | `/notes/{id}` | Update an existing note | Yes / Optional |
-| `DELETE`| `/notes/{id}` | Delete a note | Yes / Optional |
-
----
-
 ## Helpful Commands
 
 - **Run Backend**: `cd server && uvicorn app.main:app --reload`
