@@ -35,6 +35,7 @@ StepNotes/
 ## How to Run the Project
 
 ### Prerequisites
+
 - **Python 3.10+**
 - **Node.js 18+** & `npm`
 - **MySQL** or **TiDB Cloud** database
@@ -54,16 +55,20 @@ StepNotes/
      ```
 
 2. **Install Dependencies**:
+
    ```bash
    pip install -r server/requirements.txt
    ```
 
 3. **Configure Environment Variables**:
    Copy `server/.env.example` to `server/.env`:
+
    ```bash
    cp server/.env.example server/.env
    ```
+
    Open `server/.env` and fill in your database credentials and secret key:
+
    ```env
    DATABASE_URL=mysql+pymysql://<username>:<password>@<host>:<port>/<database>?ssl_verify_cert=true&ssl_verify_identity=true
    SECRET_KEY=your-super-secret-jwt-key-change-this
@@ -78,6 +83,7 @@ StepNotes/
    cd server
    uvicorn app.main:app --reload
    ```
+
    - API runs at: `http://localhost:8000`
    - Interactive Swagger API Docs: `http://localhost:8000/docs`
 
@@ -86,21 +92,26 @@ StepNotes/
 ### 2. Frontend Setup (Next.js)
 
 1. **Navigate to the client directory**:
+
    ```bash
    cd client
    ```
 
 2. **Install Dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Configure Environment Variables**:
    Copy `.env.example` to `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
+
    Ensure the API URL points to the FastAPI server:
+
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:8000
    ```
@@ -109,6 +120,7 @@ StepNotes/
    ```bash
    npm run dev
    ```
+
    - Open your browser at: `http://localhost:3000`
 
 ---
@@ -132,8 +144,10 @@ This project uses **JSON Web Tokens (JWT)** and **bcrypt** password hashing for 
 ```
 
 ### 1. Password Hashing (`server/app/auth.py`)
+
 - Passwords are never saved as plain text.
 - We use `passlib` with `bcrypt`:
+
   ```python
   pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -145,6 +159,7 @@ This project uses **JSON Web Tokens (JWT)** and **bcrypt** password hashing for 
   ```
 
 ### 2. Creating the Token (`server/app/auth.py`)
+
 - When a user logs in via `POST /users/login`, the backend verifies their password and creates a signed JWT token containing the user's email (`sub` claim) and expiration timestamp (60 minutes):
   ```python
   def create_access_token(data: dict) -> str:
@@ -154,6 +169,7 @@ This project uses **JSON Web Tokens (JWT)** and **bcrypt** password hashing for 
   ```
 
 ### 3. Protecting Routes (`get_current_user`)
+
 - Protected FastAPI endpoints use dependency injection `Depends(get_current_user)`:
   ```python
   def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -164,6 +180,7 @@ This project uses **JSON Web Tokens (JWT)** and **bcrypt** password hashing for 
   ```
 
 ### 4. Client-Side Token Storage & Request Interceptor (`client/src/lib/api.ts`)
+
 - On successful login, the client saves the token into browser `localStorage`:
   ```javascript
   localStorage.setItem("token", response.data.access_token);
@@ -181,9 +198,3 @@ This project uses **JSON Web Tokens (JWT)** and **bcrypt** password hashing for 
 - If the token expires or becomes invalid, the backend responds with `401 Unauthorized`, and the frontend removes the token and redirects the user to `/login`.
 
 ---
-
-## Helpful Commands
-
-- **Run Backend**: `cd server && uvicorn app.main:app --reload`
-- **Run Frontend**: `cd client && npm run dev`
-- **Build Frontend**: `cd client && npm run build`
